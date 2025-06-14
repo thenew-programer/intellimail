@@ -5,7 +5,9 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>IntelliMail - Advanced Email Validation Service</title>
+	<link rel="icon" type="image/png" href="favicon.png">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 	<style>
 		* {
 			margin: 0;
@@ -15,9 +17,10 @@
 
 		body {
 			font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			background: #FFFFFF;
 			min-height: 100vh;
-			color: #333;
+			color: #010c07;
+			line-height: 1.6;
 		}
 
 		.container {
@@ -28,101 +31,134 @@
 
 		.header {
 			text-align: center;
-			margin-bottom: 40px;
-			color: white;
+			margin-bottom: 50px;
+			padding: 40px 0;
+			background: linear-gradient(135deg, #94c3d2 0%, rgba(148, 195, 210, 0.8) 100%);
+			border-radius: 20px;
+			box-shadow: 0 10px 30px rgba(148, 195, 210, 0.2);
+		}
+
+		.logo-container {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 20px;
+			margin-bottom: 20px;
+		}
+
+		.logo {
+			width: 80px;
+			height: 80px;
+			object-fit: contain;
 		}
 
 		.header h1 {
-			font-size: 3rem;
+			font-size: 3.5rem;
 			margin-bottom: 10px;
-			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+			color: #010c07;
+			font-weight: 700;
+			text-shadow: 0 2px 4px rgba(1, 12, 7, 0.1);
 		}
 
 		.header p {
-			font-size: 1.2rem;
-			opacity: 0.9;
+			font-size: 1.3rem;
+			color: #010c07;
+			opacity: 0.8;
+			font-weight: 400;
 		}
 
 		.aws-badge {
 			display: inline-block;
-			background: #FF9900;
-			color: white;
-			padding: 8px 16px;
-			border-radius: 20px;
-			font-weight: bold;
-			margin: 20px 0;
-			font-size: 0.9rem;
+			background: #010c07;
+			color: #FFFFFF;
+			padding: 12px 24px;
+			border-radius: 25px;
+			font-weight: 600;
+			margin: 25px 0;
+			font-size: 1rem;
+			box-shadow: 0 4px 15px rgba(1, 12, 7, 0.2);
 		}
 
 		.main-content {
 			display: grid;
 			grid-template-columns: 1fr 1fr;
 			gap: 30px;
-			margin-bottom: 40px;
+			margin-bottom: 50px;
 		}
 
 		.card {
-			background: white;
-			border-radius: 15px;
-			padding: 30px;
-			box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+			background: #FFFFFF;
+			border-radius: 20px;
+			padding: 35px;
+			box-shadow: 0 8px 25px rgba(148, 195, 210, 0.15);
+			border: 1px solid rgba(148, 195, 210, 0.2);
 			transition: transform 0.3s ease, box-shadow 0.3s ease;
 		}
 
 		.card:hover {
 			transform: translateY(-5px);
-			box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+			box-shadow: 0 15px 40px rgba(148, 195, 210, 0.25);
 		}
 
 		.card h2 {
-			color: #667eea;
-			margin-bottom: 20px;
-			font-size: 1.5rem;
+			color: #010c07;
+			margin-bottom: 25px;
+			font-size: 1.8rem;
+			font-weight: 600;
+			display: flex;
+			align-items: center;
+			gap: 12px;
 		}
 
 		.input-group {
-			margin-bottom: 20px;
+			margin-bottom: 25px;
 		}
 
 		.input-group label {
 			display: block;
-			margin-bottom: 8px;
+			margin-bottom: 10px;
 			font-weight: 600;
-			color: #555;
+			color: #010c07;
+			font-size: 1rem;
 		}
 
 		.input-group input,
 		.input-group select {
 			width: 100%;
-			padding: 12px;
-			border: 2px solid #e1e5e9;
-			border-radius: 8px;
+			padding: 15px;
+			border: 2px solid rgba(148, 195, 210, 0.3);
+			border-radius: 12px;
 			font-size: 16px;
-			transition: border-color 0.3s ease;
+			transition: border-color 0.3s ease, box-shadow 0.3s ease;
+			background: #FFFFFF;
+			color: #010c07;
 		}
 
 		.input-group input:focus,
 		.input-group select:focus {
 			outline: none;
-			border-color: #667eea;
+			border-color: #94c3d2;
+			box-shadow: 0 0 0 3px rgba(148, 195, 210, 0.1);
 		}
 
 		.btn {
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-			color: white;
+			background: linear-gradient(135deg, #94c3d2 0%, rgba(148, 195, 210, 0.9) 100%);
+			color: #010c07;
 			border: none;
-			padding: 12px 30px;
-			border-radius: 8px;
+			padding: 15px 30px;
+			border-radius: 12px;
 			font-size: 16px;
 			font-weight: 600;
 			cursor: pointer;
 			transition: all 0.3s ease;
 			width: 100%;
+			box-shadow: 0 4px 15px rgba(148, 195, 210, 0.3);
 		}
 
 		.btn:hover {
 			transform: translateY(-2px);
-			box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+			box-shadow: 0 8px 25px rgba(148, 195, 210, 0.4);
+			background: linear-gradient(135deg, #94c3d2 0%, #94c3d2 100%);
 		}
 
 		.btn:disabled {
@@ -132,39 +168,39 @@
 		}
 
 		.result {
-			margin-top: 20px;
+			margin-top: 25px;
 			padding: 20px;
-			border-radius: 8px;
+			border-radius: 12px;
 			min-height: 50px;
 		}
 
 		.result.success {
-			background: #d4edda;
-			border: 1px solid #c3e6cb;
-			color: #155724;
+			background: rgba(148, 195, 210, 0.1);
+			border: 1px solid rgba(148, 195, 210, 0.3);
+			color: #010c07;
 		}
 
 		.result.warning {
-			background: #fff3cd;
-			border: 1px solid #ffeaa7;
-			color: #856404;
+			background: rgba(255, 193, 7, 0.1);
+			border: 1px solid rgba(255, 193, 7, 0.3);
+			color: #010c07;
 		}
 
 		.result.danger {
-			background: #f8d7da;
-			border: 1px solid #f5c6cb;
-			color: #721c24;
+			background: rgba(220, 53, 69, 0.1);
+			border: 1px solid rgba(220, 53, 69, 0.3);
+			color: #010c07;
 		}
 
 		.result.info {
-			background: #d1ecf1;
-			border: 1px solid #bee5eb;
-			color: #0c5460;
+			background: rgba(148, 195, 210, 0.1);
+			border: 1px solid rgba(148, 195, 210, 0.3);
+			color: #010c07;
 		}
 
 		.risk-score {
-			font-size: 2rem;
-			font-weight: bold;
+			font-size: 2.2rem;
+			font-weight: 700;
 			text-align: center;
 			margin: 20px 0;
 		}
@@ -173,93 +209,124 @@
 			display: grid;
 			grid-template-columns: 1fr 1fr;
 			gap: 15px;
-			margin-top: 15px;
+			margin-top: 20px;
 		}
 
 		.risk-item {
-			background: #f8f9fa;
-			padding: 10px;
-			border-radius: 6px;
+			background: rgba(148, 195, 210, 0.05);
+			padding: 15px;
+			border-radius: 10px;
 			text-align: center;
+			border: 1px solid rgba(148, 195, 210, 0.1);
 		}
 
 		.risk-item strong {
 			display: block;
-			color: #667eea;
+			color: #010c07;
+			font-weight: 600;
+			margin-bottom: 5px;
 		}
 
 		.analytics-section {
-			background: white;
-			border-radius: 15px;
+			background: #FFFFFF;
+			border-radius: 20px;
 			padding: 40px;
-			margin-bottom: 40px;
-			box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+			margin-bottom: 50px;
+			box-shadow: 0 8px 25px rgba(148, 195, 210, 0.15);
+			border: 1px solid rgba(148, 195, 210, 0.2);
+		}
+
+		.analytics-section h2 {
+			color: #010c07;
+			margin-bottom: 30px;
+			font-size: 2.2rem;
+			font-weight: 600;
+			text-align: center;
 		}
 
 		.analytics-controls {
 			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-			gap: 15px;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 20px;
 			margin-bottom: 30px;
-			padding: 20px;
-			background: #f8f9fa;
-			border-radius: 10px;
+			padding: 25px;
+			background: rgba(148, 195, 210, 0.05);
+			border-radius: 15px;
+			border: 1px solid rgba(148, 195, 210, 0.1);
 		}
 
 		.analytics-grid {
 			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 			gap: 20px;
-			margin-bottom: 30px;
+			margin-bottom: 40px;
 		}
 
 		.stat-card {
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-			color: white;
-			padding: 20px;
-			border-radius: 10px;
+			background: linear-gradient(135deg, #94c3d2 0%, rgba(148, 195, 210, 0.9) 100%);
+			color: #010c07;
+			padding: 25px;
+			border-radius: 15px;
 			text-align: center;
+			box-shadow: 0 4px 15px rgba(148, 195, 210, 0.2);
+			transition: transform 0.3s ease;
+		}
+
+		.stat-card:hover {
+			transform: translateY(-3px);
 		}
 
 		.stat-number {
-			font-size: 2.5rem;
-			font-weight: bold;
+			font-size: 2.8rem;
+			font-weight: 700;
 			display: block;
+			margin-bottom: 5px;
 		}
 
 		.stat-label {
-			font-size: 0.9rem;
-			opacity: 0.9;
+			font-size: 1rem;
+			opacity: 0.8;
+			font-weight: 500;
 		}
 
 		.charts-grid {
 			display: grid;
 			grid-template-columns: 1fr 1fr;
 			gap: 30px;
-			margin: 30px 0;
+			margin: 40px 0;
 		}
 
 		.chart-container {
-			background: #f8f9fa;
-			border-radius: 10px;
-			padding: 20px;
+			background: rgba(148, 195, 210, 0.05);
+			border-radius: 15px;
+			padding: 25px;
 			height: 350px;
+			border: 1px solid rgba(148, 195, 210, 0.1);
 		}
 
 		.chart-title {
 			text-align: center;
-			color: #667eea;
-			font-weight: bold;
-			margin-bottom: 15px;
-			font-size: 1.2rem;
+			color: #010c07;
+			font-weight: 600;
+			margin-bottom: 20px;
+			font-size: 1.3rem;
 		}
 
 		.domain-analysis {
-			background: white;
-			border-radius: 15px;
+			background: #FFFFFF;
+			border-radius: 20px;
 			padding: 40px;
-			margin-bottom: 40px;
-			box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+			margin-bottom: 50px;
+			box-shadow: 0 8px 25px rgba(148, 195, 210, 0.15);
+			border: 1px solid rgba(148, 195, 210, 0.2);
+		}
+
+		.domain-analysis h2 {
+			color: #010c07;
+			margin-bottom: 30px;
+			font-size: 2.2rem;
+			font-weight: 600;
+			text-align: center;
 		}
 
 		.domain-table {
@@ -270,139 +337,190 @@
 
 		.domain-table th,
 		.domain-table td {
-			padding: 12px;
+			padding: 15px;
 			text-align: left;
-			border-bottom: 1px solid #e1e5e9;
+			border-bottom: 1px solid rgba(148, 195, 210, 0.2);
 		}
 
 		.domain-table th {
-			background: #667eea;
-			color: white;
+			background: #94c3d2;
+			color: #010c07;
 			font-weight: 600;
 		}
 
 		.domain-table tr:hover {
-			background: #f8f9fa;
+			background: rgba(148, 195, 210, 0.05);
 		}
 
 		.trend-indicator {
 			display: inline-block;
-			padding: 4px 8px;
-			border-radius: 12px;
-			font-size: 0.8rem;
-			font-weight: bold;
+			padding: 6px 12px;
+			border-radius: 15px;
+			font-size: 0.9rem;
+			font-weight: 600;
 		}
 
 		.trend-up {
-			background: #dc3545;
-			color: white;
+			background: rgba(220, 53, 69, 0.1);
+			color: #dc3545;
+			border: 1px solid rgba(220, 53, 69, 0.3);
 		}
 
 		.trend-down {
-			background: #28a745;
-			color: white;
+			background: rgba(148, 195, 210, 0.1);
+			color: #010c07;
+			border: 1px solid rgba(148, 195, 210, 0.3);
 		}
 
 		.geographic-section {
-			background: white;
-			border-radius: 15px;
+			background: #FFFFFF;
+			border-radius: 20px;
 			padding: 40px;
-			margin-bottom: 40px;
-			box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+			margin-bottom: 50px;
+			box-shadow: 0 8px 25px rgba(148, 195, 210, 0.15);
+			border: 1px solid rgba(148, 195, 210, 0.2);
+		}
+
+		.geographic-section h2 {
+			color: #010c07;
+			margin-bottom: 30px;
+			font-size: 2.2rem;
+			font-weight: 600;
+			text-align: center;
 		}
 
 		.features {
-			background: white;
-			border-radius: 15px;
+			background: #FFFFFF;
+			border-radius: 20px;
 			padding: 40px;
-			margin-bottom: 40px;
-			box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+			margin-bottom: 50px;
+			box-shadow: 0 8px 25px rgba(148, 195, 210, 0.15);
+			border: 1px solid rgba(148, 195, 210, 0.2);
 		}
 
 		.features h2 {
 			text-align: center;
-			color: #667eea;
-			margin-bottom: 30px;
-			font-size: 2rem;
+			color: #010c07;
+			margin-bottom: 40px;
+			font-size: 2.5rem;
+			font-weight: 600;
 		}
 
 		.features-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+			gap: 30px;
+		}
+
+		.feature-card {
+			background: rgba(148, 195, 210, 0.05);
+			padding: 30px;
+			border-radius: 15px;
+			text-align: center;
+			transition: transform 0.3s ease, box-shadow 0.3s ease;
+			border: 1px solid rgba(148, 195, 210, 0.1);
+		}
+
+		.feature-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 10px 30px rgba(148, 195, 210, 0.2);
+		}
+
+		.feature-icon {
+			font-size: 3.5rem;
+			margin-bottom: 20px;
+		}
+
+		.feature-card h3 {
+			color: #010c07;
+			margin-bottom: 15px;
+			font-size: 1.3rem;
+			font-weight: 600;
+		}
+
+		.feature-card p {
+			color: #010c07;
+			opacity: 0.8;
+			line-height: 1.6;
+		}
+
+		.architecture {
+			background: #FFFFFF;
+			border-radius: 20px;
+			padding: 40px;
+			margin-bottom: 50px;
+			box-shadow: 0 8px 25px rgba(148, 195, 210, 0.15);
+			border: 1px solid rgba(148, 195, 210, 0.2);
+		}
+
+		.architecture h2 {
+			text-align: center;
+			color: #010c07;
+			margin-bottom: 40px;
+			font-size: 2.5rem;
+			font-weight: 600;
+		}
+
+		.aws-services {
 			display: grid;
 			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 			gap: 25px;
 		}
 
-		.feature-card {
-			background: #f8f9fa;
+		.aws-service {
+			background: rgba(148, 195, 210, 0.05);
 			padding: 25px;
-			border-radius: 10px;
+			border-radius: 15px;
 			text-align: center;
+			border-left: 4px solid #94c3d2;
 			transition: transform 0.3s ease;
+			border: 1px solid rgba(148, 195, 210, 0.1);
 		}
 
-		.feature-card:hover {
+		.aws-service:hover {
 			transform: translateY(-3px);
 		}
 
-		.feature-icon {
-			font-size: 3rem;
-			margin-bottom: 15px;
-		}
-
-		.feature-card h3 {
-			color: #667eea;
-			margin-bottom: 10px;
-		}
-
-		.architecture {
-			background: white;
-			border-radius: 15px;
-			padding: 40px;
-			margin-bottom: 40px;
-			box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-		}
-
-		.architecture h2 {
-			text-align: center;
-			color: #667eea;
-			margin-bottom: 30px;
-			font-size: 2rem;
-		}
-
-		.aws-services {
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-			gap: 20px;
-		}
-
-		.aws-service {
-			background: #f8f9fa;
-			padding: 20px;
-			border-radius: 10px;
-			text-align: center;
-			border-left: 4px solid #FF9900;
-		}
-
 		.aws-service h3 {
-			color: #FF9900;
-			margin-bottom: 10px;
+			color: #010c07;
+			margin-bottom: 15px;
+			font-size: 1.2rem;
+			font-weight: 600;
+		}
+
+		.aws-service p {
+			color: #010c07;
+			opacity: 0.8;
+			line-height: 1.5;
 		}
 
 		.footer {
 			text-align: center;
-			color: white;
-			padding: 30px;
-			background: rgba(0, 0, 0, 0.2);
-			border-radius: 15px;
+			color: #010c07;
+			padding: 40px;
+			background: rgba(148, 195, 210, 0.1);
+			border-radius: 20px;
+			border: 1px solid rgba(148, 195, 210, 0.2);
+		}
+
+		.footer h3 {
+			margin-bottom: 10px;
+			font-size: 1.5rem;
+			font-weight: 600;
+		}
+
+		.footer p {
+			opacity: 0.8;
+			font-size: 1.1rem;
 		}
 
 		.loading {
 			display: inline-block;
 			width: 20px;
 			height: 20px;
-			border: 3px solid #ffffff;
+			border: 3px solid rgba(1, 12, 7, 0.3);
 			border-radius: 50%;
-			border-top-color: transparent;
+			border-top-color: #010c07;
 			animation: spin 1s ease-in-out infinite;
 		}
 
@@ -422,17 +540,62 @@
 			}
 
 			.header h1 {
-				font-size: 2rem;
+				font-size: 2.5rem;
+			}
+
+			.logo-container {
+				flex-direction: column;
+				gap: 15px;
+			}
+
+			.logo {
+				width: 60px;
+				height: 60px;
+			}
+
+			.container {
+				padding: 15px;
+			}
+
+			.card {
+				padding: 25px;
+			}
+
+			.analytics-section,
+			.domain-analysis,
+			.geographic-section,
+			.features,
+			.architecture {
+				padding: 25px;
 			}
 		}
 
 		.error-message {
-			background: #f8d7da;
-			border: 1px solid #f5c6cb;
-			color: #721c24;
-			padding: 15px;
-			border-radius: 8px;
-			margin: 20px 0;
+			background: rgba(220, 53, 69, 0.1);
+			border: 1px solid rgba(220, 53, 69, 0.3);
+			color: #010c07;
+			padding: 20px;
+			border-radius: 12px;
+			margin: 25px 0;
+		}
+
+		/* Custom scrollbar */
+		::-webkit-scrollbar {
+			width: 8px;
+		}
+
+		::-webkit-scrollbar-track {
+			background: rgba(148, 195, 210, 0.1);
+			border-radius: 4px;
+		}
+
+		::-webkit-scrollbar-thumb {
+			background: #94c3d2;
+			border-radius: 4px;
+		}
+
+		::-webkit-scrollbar-thumb:hover {
+			background: rgba(148, 195, 210, 0.8);
 		}
 	</style>
 </head>
@@ -440,14 +603,16 @@
 <body>
 	<div class="container">
 		<header class="header">
-			<h1>🚀 IntelliMail</h1>
+			<div class="logo-container">
+				<h1>IntelliMail</h1>
+			</div>
 			<p>Advanced Email Validation Service powered by AWS Lambda</p>
 			<div class="aws-badge">AWS Lambda Hackathon 2025</div>
 		</header>
 
 		<div class="main-content">
 			<div class="card">
-				<h2>🔍 Email Validation</h2>
+				<h2>Email Validation</h2>
 				<div class="input-group">
 					<label for="email">Enter Email Address:</label>
 					<input type="email" id="email" placeholder="example@domain.com">
@@ -460,7 +625,7 @@
 			</div>
 
 			<div class="card">
-				<h2>📊 Real-time Analytics</h2>
+				<h2>Real-time Analytics</h2>
 				<div class="analytics-controls">
 					<select id="days-filter">
 						<option value="7">Last 7 days</option>
@@ -482,7 +647,7 @@
 		</div>
 
 		<div class="analytics-section">
-			<h2>📊 Live System Analytics</h2>
+			<h2>Live System Analytics</h2>
 			<div class="analytics-grid">
 				<div class="stat-card">
 					<span class="stat-number" id="total-validations">0</span>
@@ -528,7 +693,7 @@
 		</div>
 
 		<div class="domain-analysis">
-			<h2>🌐 Domain Analysis</h2>
+			<h2>Domain Analysis</h2>
 			<div class="charts-grid">
 				<div>
 					<h3>Top Domains by Volume</h3>
@@ -560,35 +725,22 @@
 				</div>
 			</div>
 		</div>
-
-		<div class="geographic-section">
-			<h2>🌍 Geographic Analysis</h2>
-			<div class="chart-container">
-				<div class="chart-title">Validations by Country</div>
-				<canvas id="geographicChart"></canvas>
-			</div>
-		</div>
-
 		<div class="features">
-			<h2>🌟 Key Features</h2>
+			<h2>Key Features</h2>
 			<div class="features-grid">
 				<div class="feature-card">
-					<div class="feature-icon">⚡</div>
 					<h3>Serverless Architecture</h3>
-					<p>Built entirely on AWS Lambda for infinite scalability and cost-effectiveness</p>
+					<p>Built on AWS for scalability and cost-effectiveness</p>
 				</div>
 				<div class="feature-card">
-					<div class="feature-icon">🛡️</div>
 					<h3>Advanced Risk Scoring</h3>
 					<p>ML-powered risk assessment with 15+ validation criteria</p>
 				</div>
 				<div class="feature-card">
-					<div class="feature-icon">📈</div>
 					<h3>Real-time Analytics</h3>
 					<p>Comprehensive analytics dashboard with trend analysis</p>
 				</div>
 				<div class="feature-card">
-					<div class="feature-icon">🔄</div>
 					<h3>Auto-updating Lists</h3>
 					<p>Automated domain blocklist updates from multiple sources</p>
 				</div>
@@ -596,7 +748,7 @@
 		</div>
 
 		<div class="architecture">
-			<h2>🏗️ AWS Architecture</h2>
+			<h2>AWS Architecture</h2>
 			<div class="aws-services">
 				<div class="aws-service">
 					<h3>AWS Lambda</h3>
@@ -812,24 +964,16 @@
 		}
 
 		function updateCharts(data) {
-			// Risk Score Distribution Chart
 			if (data.riskAnalysis?.distribution) {
 				updateRiskChart(data.riskAnalysis.distribution);
 			}
 
-			// Timeline Chart
 			if (data.timeSeriesData) {
 				updateTimelineChart(data.timeSeriesData);
 			}
 
-			// Risk Factors Chart
 			if (data.riskAnalysis?.riskFactors) {
 				updateRiskFactorsChart(data.riskAnalysis.riskFactors);
-			}
-
-			// Geographic Chart
-			if (data.geographicData) {
-				updateGeographicChart(data.geographicData);
 			}
 		}
 
@@ -973,64 +1117,6 @@
 					scales: {
 						y: {
 							beginAtZero: true
-						}
-					}
-				}
-			});
-		}
-
-		function updateGeographicChart(geographicData) {
-			const ctx = document.getElementById('geographicChart').getContext('2d');
-
-			if (geographicChart) {
-				geographicChart.destroy();
-			}
-
-			const labels = geographicData.map(item => item.country);
-			const counts = geographicData.map(item => item.count);
-			const riskScores = geographicData.map(item => item.averageRiskScore);
-
-			geographicChart = new Chart(ctx, {
-				type: 'bar',
-				data: {
-					labels: labels,
-					datasets: [
-						{
-							label: 'Validations',
-							data: counts,
-							backgroundColor: 'rgba(102, 126, 234, 0.8)',
-							borderColor: 'rgba(102, 126, 234, 1)',
-							borderWidth: 1,
-							yAxisID: 'y'
-						},
-						{
-							label: 'Avg Risk Score',
-							data: riskScores,
-							type: 'line',
-							borderColor: 'rgba(220, 53, 69, 1)',
-							backgroundColor: 'rgba(220, 53, 69, 0.1)',
-							yAxisID: 'y1'
-						}
-					]
-				},
-				options: {
-					responsive: true,
-					maintainAspectRatio: false,
-					scales: {
-						y: {
-							type: 'linear',
-							display: true,
-							position: 'left',
-							beginAtZero: true
-						},
-						y1: {
-							type: 'linear',
-							display: true,
-							position: 'right',
-							beginAtZero: true,
-							grid: {
-								drawOnChartArea: false,
-							},
 						}
 					}
 				}

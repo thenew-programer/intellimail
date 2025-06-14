@@ -1,0 +1,11 @@
+{
+  "name": "document-pipeline-shared",
+  "version": "1.0.0",
+  "description": "Shared utilities for document pipeline",
+  "dependencies": {
+    "aws-sdk": "^2.1400.0",
+    "axios": "^1.9.0",
+    "dns": "^0.2.2",
+    "net": "^1.0.2"
+  }
+}

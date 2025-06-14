@@ -1,0 +1,248 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Fake Email Detector using AWS Lambda
+
+Globals:
+  Function:
+    Timeout: 10
+    Runtime: nodejs22.x
+    MemorySize: 256
+    Environment:
+      Variables:
+        DOMAINS_TABLE: !Ref DisposableDomainsTable
+        ANALYTICS_TABLE: !Ref AnalyticsTable
+  Api:
+    # Global CORS configuration
+    Cors:
+      AllowMethods: "'GET,POST,OPTIONS'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+      AllowOrigin: "'*'"
+      AllowCredentials: false
+
+Resources:
+  # S3 Bucket for Frontend
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "email-validator-frontend-${AWS::AccountId}"
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+
+  # Bucket Policy for Public Access
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Sub "arn:aws:s3:::${FrontendBucket}/*"
+
+  # CloudFront Distribution (Recommended)
+  FrontendDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        DefaultRootObject: index.html
+        Origins:
+          - DomainName: !GetAtt FrontendBucket.DomainName
+            Id: FrontendOrigin
+            S3OriginConfig: {}
+        DefaultCacheBehavior:
+          TargetOriginId: FrontendOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachedMethods:
+            - GET
+            - HEAD
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+        Enabled: true
+        PriceClass: PriceClass_100
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+
+  # Shared Layer
+  SharedLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub '${AWS::StackName}-shared-layer'
+      Description: Shared utilities for document pipeline
+      ContentUri: src/layers/shared/
+      CompatibleRuntimes:
+        - nodejs22.x
+
+  # API Gateway
+  EmailValidatorApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      # Auth:
+      #   ApiKeyRequired: true
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+        AllowCredentials: false
+      GatewayResponses:
+        DEFAULT_4XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+          ResponseTemplates:
+            application/json: '{"message": $context.error.messageString}'
+        DEFAULT_5XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+          ResponseTemplates:
+            application/json: '{"message": $context.error.messageString}'
+
+  # Main Lambda Function
+  EmailValidatorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/lambda
+      Handler: emailValidator.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DisposableDomainsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AnalyticsTable
+      Layers:
+        - !Ref SharedLayer
+      Events:
+        ValidateEmail:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EmailValidatorApi
+            Path: /validate-email
+            Method: POST
+            # Auth:
+            #   ApiKeyRequired: true
+        # Add explicit OPTIONS method for CORS preflight
+        ValidateEmailOptions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EmailValidatorApi
+            Path: /validate-email
+            Method: OPTIONS
+            # Auth:
+            #   ApiKeyRequired: false
+
+ # Domain Updater Function - FIXED
+  DomainUpdaterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/lambda/  # Fixed: Added lambda/ directory
+      Handler: domainUpdater.handler  # Fixed: Removed lambda/ from handler
+      Timeout: 300  # 5 minutes for large domain lists
+      MemorySize: 512  # Increased memory for processing large lists
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DisposableDomainsTable
+      Layers:
+        - !Ref SharedLayer
+      Events:
+        ScheduleEvent:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 day)
+
+  # Analytics Function
+  AnalyticsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/lambda/
+      Handler: analytics.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref AnalyticsTable
+      Layers:
+        - !Ref SharedLayer
+      Events:
+        GetAnalytics:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EmailValidatorApi
+            Path: /analytics
+            Method: GET
+            # Auth:
+            #   ApiKeyRequired: true
+        # Add explicit OPTIONS method for CORS preflight
+        GetAnalyticsOptions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EmailValidatorApi
+            Path: /analytics
+            Method: OPTIONS
+            # Auth:
+            #   ApiKeyRequired: false
+
+  # DynamoDB Tables - FIXED
+  DisposableDomainsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: disposable-domains  # Fixed: Changed to match code expectation
+      AttributeDefinitions:
+        - AttributeName: domain
+          AttributeType: S
+      KeySchema:
+        - AttributeName: domain
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      TimeToLiveSpecification:  # Added: TTL support for the ttl attribute
+        AttributeName: ttl
+        Enabled: true
+
+  AnalyticsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: email-validation-analytics  # Fixed: Changed to kebab-case for consistency
+      AttributeDefinitions:
+        - AttributeName: date
+          AttributeType: S
+        - AttributeName: domain
+          AttributeType: S
+      KeySchema:
+        - AttributeName: date
+          KeyType: HASH
+        - AttributeName: domain
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+
+Outputs:
+  ApiUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${EmailValidatorApi}.execute-api.${AWS::Region}.amazonaws.com/prod"
+  CloudFrontUrl:
+    Description: "CloudFront distribution URL"
+    Value: !GetAtt FrontendDistribution.DomainName
+  DomainsTableName:
+    Description: "DynamoDB table name for disposable domains"
+    Value: !Ref DisposableDomainsTable
+  AnalyticsTableName:
+    Description: "DynamoDB table name for analytics"
+    Value: !Ref AnalyticsTable

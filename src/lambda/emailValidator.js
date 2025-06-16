@@ -1,4 +1,7 @@
-const { dynamoDb, dns, net } = require('/opt/nodejs/utils');
+const { axios, dynamoDb, dns, net, getApiKey } = require('/opt/nodejs/utils');
+
+const domainCache = new Map();
+const TTL_MS = 5 * 60 * 1000;
 
 exports.handler = async (event) => {
     if (event.httpMethod === 'OPTIONS') {
@@ -8,7 +11,6 @@ exports.handler = async (event) => {
     try {
         const { email, metadata = {}, strictMode = false } = JSON.parse(event.body);
         
-        // Basic validation
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             return formatResponse(400, { error: 'Invalid email format' });
         }
@@ -332,7 +334,7 @@ async function checkSMTPServer(domain) {
             const timeout = setTimeout(() => {
                 socket.destroy();
                 resolve({ smtpAvailable: false, reason: 'timeout' });
-            }, 5000);
+            }, 2000);
             
             socket.connect(25, primaryMX.exchange, () => {
                 clearTimeout(timeout);
@@ -352,12 +354,18 @@ async function checkSMTPServer(domain) {
 }
 
 async function checkDomainRegistrar(domain) {
+	const cached = domainCache.get(domain);
+	const now = Date.now();
+
+	if (cached && now - cached.timestamp < TTL_MS) {
+		return cached.value;
+	}
+
     const domainParts = domain.toLowerCase().split('.');
     const rootDomain = domainParts.length > 2 
         ? domainParts.slice(-2).join('.') 
         : domainParts.join('.');
     
-    // Known suspicious patterns
     const suspiciousRegistrars = [
         'freenom', 'dot.tk', 'namecheap', 'porkbun', 'namebright',
         'reg.ru', 'nic.ru', 'r01.ru', 'regtime', 'webnic'
@@ -377,22 +385,18 @@ async function checkDomainRegistrar(domain) {
         registrar: null
     };
     
-    // Check for IP address
     if (net.isIP(domain)) {
         patterns.isIP = true;
         return patterns;
     }
     
-    // Check TLD patterns
     const tld = domainParts.slice(-1)[0];
     patterns.disposableTLD = disposableTLDs.has(tld);
     
-    // Check for free domains
     patterns.freeRegistration = [
         'tk', 'ml', 'ga', 'cf', 'gq'
     ].includes(tld);
     
-    // Check for bulk registration patterns
     const domainName = domainParts[0];
     patterns.bulkRegistration = (
         /\d{4,}/.test(domainName) || 
@@ -401,12 +405,22 @@ async function checkDomainRegistrar(domain) {
     );
     
     try {
-        const whoisResponse = await axios.get(`https://whois.freeaiapi.xyz/?domain=${rootDomain}`, {
-            timeout: 5000
-        });
+		const apiKey = await getApiKey();
+
+		const headers = {
+		  apikey: apiKey
+		};
+
+		console.log("api key = ", apiKey);
+		const whoisResponse = await axios.get(
+		  `https://api.apilayer.com/whois/query?domain=${rootDomain}`,
+		  {
+			headers,
+		  }
+		);
         
-        const whoisData = whoisResponse.data.toLowerCase();
-        patterns.registrar = whoisData.match(/registrar:\s*(.*)/)?.[1] || null;
+        const whoisData = whoisResponse.data.result;
+		patterns.registrar = whoisData.registrar?.toLowerCase() || null;
         
         if (patterns.registrar) {
             patterns.suspiciousRegistrar = suspiciousRegistrars.some(reg => 
@@ -418,6 +432,7 @@ async function checkDomainRegistrar(domain) {
         console.error(`WHOIS lookup failed for ${domain}:`, e.message);
     }
     
+	domainCache.set(domain, { value: patterns, timestamp: now });
     return patterns;
 }
 

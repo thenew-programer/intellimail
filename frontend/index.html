@@ -917,7 +917,7 @@
 					aggregation: aggregation
 				});
 
-				const response = await fetch(`${ANALYTICS_ENDPOINT}?${params}`);
+				const response = await fetch(`${ANALYTICS_ENDPOINT}`);
 
 				if (!response.ok) {
 					throw new Error(`HTTP error! status: ${response.status}`);

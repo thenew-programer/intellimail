@@ -131,6 +131,11 @@ Resources:
             TableName: !Ref DisposableDomainsTable
         - DynamoDBCrudPolicy:
             TableName: !Ref AnalyticsTable
+        - Statement:
+          - Effect: Allow
+            Action:
+              - secretsmanager:GetSecretValue
+            Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:WHOIS_API_KEY-Xe4zIr
       Layers:
         - !Ref SharedLayer
       Events:

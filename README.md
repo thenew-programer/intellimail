@@ -1,5 +1,6 @@
 # IntelliMail - Advanced Email Validation Service powered by AWS Lambda
 
+![demo](./assets/intellimail-demo.gif)
 IntelliMail is a serverless application built with AWS services that provides comprehensive email validation through advanced multi-layered analysis, helping businesses prevent fake registrations, improve data quality, and detect fraudulent email addresses.
 
 ## Problem Statement
@@ -140,8 +141,8 @@ Returns validation statistics and insights.
 ### Deployment
 ```bash
 # Clone the repository
-git clone <your-repo-url>
-cd disposable-email-detector
+git clone https://github.com/thenew-programer/intellimail.git
+cd intellimail
 
 # Build and deploy
 sam build
